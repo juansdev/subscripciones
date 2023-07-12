@@ -104,6 +104,7 @@ namespace WebAPIAutores
             });
 
             services.AddScoped<ServicioLlaves>();
+            services.AddHostedService<FacturasHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
