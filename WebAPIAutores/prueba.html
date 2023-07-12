@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FrontEnd</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+</head>
+<body>
+<script>
+    const headers = new Headers({
+        "X-Api-Key": "741397a9605241fabc3f0363268ecc41"
+    });
+
+    fetch("https://localhost:5001/api/autores", {headers})
+        .then(response => response.json())
+        .then(data => console.log(data));
+</script>
+</body>
+</html>

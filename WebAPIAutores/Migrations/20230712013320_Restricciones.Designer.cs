@@ -12,7 +12,7 @@ using WebAPIAutores;
 namespace WebAPIAutores.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230712011122_Restricciones")]
+    [Migration("20230712013320_Restricciones")]
     partial class Restricciones
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -353,6 +353,48 @@ namespace WebAPIAutores.Migrations
                     b.ToTable("Peticiones");
                 });
 
+            modelBuilder.Entity("WebAPIAutores.Entidades.RestriccionDominio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Dominio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LlaveId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LlaveId");
+
+                    b.ToTable("RestriccionesDominio");
+                });
+
+            modelBuilder.Entity("WebAPIAutores.Entidades.RestriccionIP", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("IP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LlaveId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LlaveId");
+
+                    b.ToTable("RestriccionesIps");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -460,6 +502,28 @@ namespace WebAPIAutores.Migrations
                     b.Navigation("Llave");
                 });
 
+            modelBuilder.Entity("WebAPIAutores.Entidades.RestriccionDominio", b =>
+                {
+                    b.HasOne("WebAPIAutores.Entidades.LlaveAPI", "Llave")
+                        .WithMany("RestriccionesDominio")
+                        .HasForeignKey("LlaveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Llave");
+                });
+
+            modelBuilder.Entity("WebAPIAutores.Entidades.RestriccionIP", b =>
+                {
+                    b.HasOne("WebAPIAutores.Entidades.LlaveAPI", "Llave")
+                        .WithMany("RestriccionesIP")
+                        .HasForeignKey("LlaveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Llave");
+                });
+
             modelBuilder.Entity("WebAPIAutores.Entidades.Autor", b =>
                 {
                     b.Navigation("AutoresLibros");
@@ -470,6 +534,13 @@ namespace WebAPIAutores.Migrations
                     b.Navigation("AutoresLibros");
 
                     b.Navigation("Comentarios");
+                });
+
+            modelBuilder.Entity("WebAPIAutores.Entidades.LlaveAPI", b =>
+                {
+                    b.Navigation("RestriccionesDominio");
+
+                    b.Navigation("RestriccionesIP");
                 });
 #pragma warning restore 612, 618
         }

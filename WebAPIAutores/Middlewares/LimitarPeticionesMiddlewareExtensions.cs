@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -61,7 +62,10 @@ public class LimitarPeticionesMiddleware
 
         var llave = llaveStringValues[0];
 
-        var llaveDb = await context.LlavesAPI.FirstOrDefaultAsync(x => x.Llave == llave);
+        var llaveDb = await context.LlavesAPI
+            .Include(x => x.RestriccionesDominio)
+            .Include(x => x.RestriccionesIP)
+            .FirstOrDefaultAsync(x => x.Llave == llave);
 
         if (llaveDb == null)
         {
@@ -92,10 +96,44 @@ public class LimitarPeticionesMiddleware
             }
         }
 
+        var superaRestricciones = PeticionSuperaAlgunaDeLasRestricciones(llaveDb, httpContext);
+
+        if (!superaRestricciones)
+        {
+            httpContext.Response.StatusCode = 403;
+            return;
+        }
+
         var peticion = new Peticion { LlaveId = llaveDb.Id, FechaPeticion = DateTime.UtcNow };
         context.Add(peticion);
         await context.SaveChangesAsync();
 
         await _siguiente(httpContext);
+    }
+
+    private bool PeticionSuperaAlgunaDeLasRestricciones(LlaveAPI llaveApi, HttpContext httpContext)
+    {
+        var hayRestricciones = llaveApi.RestriccionesDominio.Any() || llaveApi.RestriccionesIP.Any();
+        if (!hayRestricciones) return true;
+
+        var peticionSuperaLasRestriccionesDeDominio =
+            PeticionSuperaLasRestriccionesDeDominio(llaveApi.RestriccionesDominio, httpContext);
+
+        return peticionSuperaLasRestriccionesDeDominio;
+    }
+
+    private bool PeticionSuperaLasRestriccionesDeDominio(List<RestriccionDominio> restricciones,
+        HttpContext httpContext)
+    {
+        if (restricciones == null || restricciones.Count == 0) return false;
+
+        var referer = httpContext.Request.Headers["Referer"].ToString();
+        if (referer == string.Empty) return false;
+
+        var myUri = new Uri(referer);
+        var host = myUri.Host;
+
+        var superaRestriccion = restricciones.Any(x => x.Dominio == host);
+        return superaRestriccion;
     }
 }
