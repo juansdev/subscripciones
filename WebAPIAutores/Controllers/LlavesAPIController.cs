@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPIAutores.DTOs;
+using WebAPIAutores.Entidades;
 using WebAPIAutores.Servicios;
 
 namespace WebAPIAutores.Controllers;
@@ -14,7 +15,7 @@ namespace WebAPIAutores.Controllers;
 [ApiController]
 [Route("api/llavesapi")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class LlavesAPIController: CustomBaseController
+public class LlavesAPIController : CustomBaseController
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -31,7 +32,9 @@ public class LlavesAPIController: CustomBaseController
     public async Task<List<LlaveDto>> MisLlaves()
     {
         var usuarioId = ObtenerUsuarioId();
-        var llaves = await _context.LlavesAPI.Where(x => x.UsuarioId == usuarioId).ToListAsync();
+        var llaves = await _context.LlavesAPI
+            .Include(x => x.RestriccionesDominio)
+            .Where(x => x.UsuarioId == usuarioId).ToListAsync();
         return _mapper.Map<List<LlaveDto>>(llaves);
     }
 
@@ -39,10 +42,10 @@ public class LlavesAPIController: CustomBaseController
     public async Task<ActionResult> CrearLlave(CrearLlaveDto crearLlaveDto)
     {
         var usuarioId = ObtenerUsuarioId();
-        if (crearLlaveDto.TipoLlave == Entidades.TipoLlave.Gratuita)
+        if (crearLlaveDto.TipoLlave == TipoLlave.Gratuita)
         {
             var elUsuarioYaTieneUnaLlaveGratuita = await _context.LlavesAPI.AnyAsync(x =>
-                x.UsuarioId == usuarioId && x.TipoLlave == Entidades.TipoLlave.Gratuita);
+                x.UsuarioId == usuarioId && x.TipoLlave == TipoLlave.Gratuita);
             if (elUsuarioYaTieneUnaLlaveGratuita)
             {
                 return BadRequest("El usuario ya tiene una llave gratuita");
@@ -57,7 +60,7 @@ public class LlavesAPIController: CustomBaseController
     public async Task<ActionResult> ActualizarLlave(ActualizarLlaveDto actualizarLlaveDto)
     {
         var usuarioId = ObtenerUsuarioId();
-        var llaveDB = await _context.LlavesAPI.FirstOrDefaultAsync(x=>x.Id==actualizarLlaveDto.LlaveId);
+        var llaveDB = await _context.LlavesAPI.FirstOrDefaultAsync(x => x.Id == actualizarLlaveDto.LlaveId);
         if (llaveDB == null)
         {
             return NotFound();

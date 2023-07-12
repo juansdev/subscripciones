@@ -1,14 +1,11 @@
-﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using WebAPIAutores.DTOs;
 using WebAPIAutores.Entidades;
 
 namespace WebAPIAutores.Utilidades
 {
-    public class AutoMapperProfiles: Profile
+    public class AutoMapperProfiles : Profile
     {
         public AutoMapperProfiles()
         {
@@ -28,13 +25,18 @@ namespace WebAPIAutores.Utilidades
             CreateMap<Comentario, ComentarioDTO>();
 
             CreateMap<LlaveAPI, LlaveDto>();
+
+            CreateMap<RestriccionDominio, RestriccionDominioDto>();
         }
 
         private List<LibroDTO> MapAutorDTOLibros(Autor autor, AutorDTO autorDTO)
         {
             var resultado = new List<LibroDTO>();
 
-            if (autor.AutoresLibros == null) { return resultado; }
+            if (autor.AutoresLibros == null)
+            {
+                return resultado;
+            }
 
             foreach (var autorLibro in autor.AutoresLibros)
             {
@@ -52,7 +54,10 @@ namespace WebAPIAutores.Utilidades
         {
             var resultado = new List<AutorDTO>();
 
-            if (libro.AutoresLibros == null) { return resultado; }
+            if (libro.AutoresLibros == null)
+            {
+                return resultado;
+            }
 
             foreach (var autorlibro in libro.AutoresLibros)
             {
@@ -70,7 +75,10 @@ namespace WebAPIAutores.Utilidades
         {
             var resultado = new List<AutorLibro>();
 
-            if (libroCreacionDTO.AutoresIds == null) { return resultado; }
+            if (libroCreacionDTO.AutoresIds == null)
+            {
+                return resultado;
+            }
 
             foreach (var autorId in libroCreacionDTO.AutoresIds)
             {
