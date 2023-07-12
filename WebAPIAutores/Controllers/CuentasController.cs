@@ -1,35 +1,36 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using WebAPIAutores.DTOs;
+using WebAPIAutores.Entidades;
 using WebAPIAutores.Servicios;
 
 namespace WebAPIAutores.Controllers
 {
     [ApiController]
     [Route("api/cuentas")]
-    public class CuentasController: ControllerBase
+    public class CuentasController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly IConfiguration configuration;
-        private readonly SignInManager<IdentityUser> signInManager;
         private readonly ServicioLlaves _servicioLlaves;
+        private readonly IConfiguration configuration;
         private readonly IDataProtector dataProtector;
+        private readonly SignInManager<Usuario> signInManager;
+        private readonly UserManager<Usuario> userManager;
 
-        public CuentasController(UserManager<IdentityUser> userManager,
+        public CuentasController(UserManager<Usuario> userManager,
             IConfiguration configuration,
-            SignInManager<IdentityUser> signInManager,
+            SignInManager<Usuario> signInManager,
             ServicioLlaves servicioLlaves)
         {
             this.userManager = userManager;
@@ -41,13 +42,16 @@ namespace WebAPIAutores.Controllers
         [HttpPost("registrar")] // api/cuentas/registrar
         public async Task<ActionResult<RespuestaAutenticacion>> Registrar(CredencialesUsuario credencialesUsuario)
         {
-            var usuario = new IdentityUser { UserName = credencialesUsuario.Email, 
-                Email = credencialesUsuario.Email };
+            var usuario = new Usuario
+            {
+                UserName = credencialesUsuario.Email,
+                Email = credencialesUsuario.Email
+            };
             var resultado = await userManager.CreateAsync(usuario, credencialesUsuario.Password);
 
             if (resultado.Succeeded)
             {
-                await _servicioLlaves.CrearLlave(usuario.Id, Entidades.TipoLlave.Gratuita);
+                await _servicioLlaves.CrearLlave(usuario.Id, TipoLlave.Gratuita);
                 return await ConstruirToken(credencialesUsuario, usuario.Id);
             }
             else
@@ -89,7 +93,8 @@ namespace WebAPIAutores.Controllers
             return await ConstruirToken(credencialesUsuario, usuarioId);
         }
 
-        private async Task<RespuestaAutenticacion> ConstruirToken(CredencialesUsuario credencialesUsuario, string usuarioId)
+        private async Task<RespuestaAutenticacion> ConstruirToken(CredencialesUsuario credencialesUsuario,
+            string usuarioId)
         {
             var claims = new List<Claim>()
             {

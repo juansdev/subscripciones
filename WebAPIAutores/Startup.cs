@@ -1,7 +1,10 @@
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,11 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.IO;
-using System.Text;
-using System.Text.Json.Serialization;
+using WebAPIAutores.Entidades;
 using WebAPIAutores.Filtros;
 using WebAPIAutores.Middlewares;
 using WebAPIAutores.Servicios;
@@ -34,24 +33,23 @@ namespace WebAPIAutores
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(opciones =>
-            {
-                opciones.Filters.Add(typeof(FiltroDeExcepcion));
-            }).AddJsonOptions(x =>
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles).AddNewtonsoftJson();
+            services.AddControllers(opciones => { opciones.Filters.Add(typeof(FiltroDeExcepcion)); }).AddJsonOptions(
+                x =>
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles).AddNewtonsoftJson();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection")));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opciones => opciones.TokenValidationParameters = new TokenValidationParameters { 
-                  ValidateIssuer = false,
-                  ValidateAudience = false,
-                  ValidateLifetime = true,
-                  ValidateIssuerSigningKey = true,
-                  IssuerSigningKey = new SymmetricSecurityKey(
-                      Encoding.UTF8.GetBytes(Configuration["llavejwt"])),
-                  ClockSkew = TimeSpan.Zero
+                .AddJwtBearer(opciones => opciones.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(Configuration["llavejwt"])),
+                    ClockSkew = TimeSpan.Zero
                 });
 
             services.AddSwaggerGen(c =>
@@ -78,15 +76,14 @@ namespace WebAPIAutores
                                 Id = "Bearer"
                             }
                         },
-                        new string[]{}
+                        new string[] { }
                     }
                 });
-
             });
 
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<Usuario, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -117,7 +114,6 @@ namespace WebAPIAutores
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-             
             }
 
             app.UseSwagger();
@@ -133,10 +129,7 @@ namespace WebAPIAutores
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

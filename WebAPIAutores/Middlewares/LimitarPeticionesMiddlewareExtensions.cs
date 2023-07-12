@@ -65,6 +65,7 @@ public class LimitarPeticionesMiddleware
         var llaveDb = await context.LlavesAPI
             .Include(x => x.RestriccionesDominio)
             .Include(x => x.RestriccionesIP)
+            .Include(x => x.Usuario)
             .FirstOrDefaultAsync(x => x.Llave == llave);
 
         if (llaveDb == null)
@@ -94,6 +95,12 @@ public class LimitarPeticionesMiddleware
                     "Ha excedido el límite de peticiones por día. Si desea realizar más peticiones, actualice su suscripción a una cuenta profesional");
                 return;
             }
+        }
+        else if (llaveDb.Usuario.MalaPaga)
+        {
+            httpContext.Response.StatusCode = 400;
+            await httpContext.Response.WriteAsync("El usuario es un mala paga.");
+            return;
         }
 
         var superaRestricciones = PeticionSuperaAlgunaDeLasRestricciones(llaveDb, httpContext);

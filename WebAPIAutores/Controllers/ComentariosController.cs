@@ -1,13 +1,12 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WebAPIAutores.DTOs;
 using WebAPIAutores.Entidades;
 
@@ -15,15 +14,15 @@ namespace WebAPIAutores.Controllers
 {
     [ApiController]
     [Route("api/libros/{libroId:int}/comentarios")]
-    public class ComentariosController: ControllerBase
+    public class ComentariosController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<Usuario> userManager;
 
         public ComentariosController(ApplicationDbContext context,
             IMapper mapper,
-            UserManager<IdentityUser> userManager)
+            UserManager<Usuario> userManager)
         {
             this.context = context;
             this.mapper = mapper;
@@ -77,7 +76,7 @@ namespace WebAPIAutores.Controllers
             var comentario = mapper.Map<Comentario>(comentarioCreacionDTO);
             comentario.LibroId = libroId;
             comentario.UsuarioId = usuarioId;
-            context.Add(comentario);
+            context.Add((object)comentario);
             await context.SaveChangesAsync();
 
             var comentarioDTO = mapper.Map<ComentarioDTO>(comentario);

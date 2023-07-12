@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPIAutores;
 
@@ -11,9 +12,10 @@ using WebAPIAutores;
 namespace WebAPIAutores.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230712022148_UsuarioMalaPaga")]
+    partial class UsuarioMalaPaga
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,7 +243,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Autores", (string)null);
+                    b.ToTable("Autores");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.AutorLibro", b =>
@@ -259,7 +261,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasIndex("LibroId");
 
-                    b.ToTable("AutoresLibros", (string)null);
+                    b.ToTable("AutoresLibros");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.Comentario", b =>
@@ -285,7 +287,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("Comentarios", (string)null);
+                    b.ToTable("Comentarios");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.Libro", b =>
@@ -306,7 +308,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Libros", (string)null);
+                    b.ToTable("Libros");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.LlaveAPI", b =>
@@ -333,7 +335,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("LlavesAPI", (string)null);
+                    b.ToTable("LlavesAPI");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.Peticion", b =>
@@ -354,7 +356,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasIndex("LlaveId");
 
-                    b.ToTable("Peticiones", (string)null);
+                    b.ToTable("Peticiones");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.RestriccionDominio", b =>
@@ -375,7 +377,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasIndex("LlaveId");
 
-                    b.ToTable("RestriccionesDominio", (string)null);
+                    b.ToTable("RestriccionesDominio");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.RestriccionIP", b =>
@@ -396,7 +398,7 @@ namespace WebAPIAutores.Migrations
 
                     b.HasIndex("LlaveId");
 
-                    b.ToTable("RestriccionesIps", (string)null);
+                    b.ToTable("RestriccionesIps");
                 });
 
             modelBuilder.Entity("WebAPIAutores.Entidades.Usuario", b =>
