@@ -119,7 +119,20 @@ public class LimitarPeticionesMiddleware
         var peticionSuperaLasRestriccionesDeDominio =
             PeticionSuperaLasRestriccionesDeDominio(llaveApi.RestriccionesDominio, httpContext);
 
-        return peticionSuperaLasRestriccionesDeDominio;
+        var peticionSuperaLasRestriccionesDeIP =
+            PeticionSuperaLasRestriccionesDeIP(llaveApi.RestriccionesIP, httpContext);
+        return peticionSuperaLasRestriccionesDeDominio || peticionSuperaLasRestriccionesDeIP;
+    }
+
+    private bool PeticionSuperaLasRestriccionesDeIP(List<RestriccionIP> restricciones, HttpContext httpContext)
+    {
+        if (restricciones == null || restricciones.Count == 0) return false;
+        var IP = httpContext.Connection.RemoteIpAddress.ToString();
+
+        if (IP == string.Empty) return false;
+
+        var superaRestriccion = restricciones.Any(x => x.IP == IP);
+        return superaRestriccion;
     }
 
     private bool PeticionSuperaLasRestriccionesDeDominio(List<RestriccionDominio> restricciones,
