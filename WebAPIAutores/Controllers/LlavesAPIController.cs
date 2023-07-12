@@ -34,6 +34,7 @@ public class LlavesAPIController : CustomBaseController
         var usuarioId = ObtenerUsuarioId();
         var llaves = await _context.LlavesAPI
             .Include(x => x.RestriccionesDominio)
+            .Include(x => x.RestriccionesIP)
             .Where(x => x.UsuarioId == usuarioId).ToListAsync();
         return _mapper.Map<List<LlaveDto>>(llaves);
     }
